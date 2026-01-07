@@ -104,11 +104,68 @@ class ViettapController extends Controller
 
     public function submit(Request $request)
     {
-        return response()->json(['status' => 'submitted']);
+        $data = $request->validate([
+            'transaction_id' => 'required|string|exists:transactions,transaction_id',
+            'status' => 'required|in:pending,paid,completed,cancelled,failed',
+        ]);
+
+        $tx = Transaction::where('transaction_id', $data['transaction_id'])->first();
+        $tx->status = $data['status'];
+        $tx->save();
+
+        return response()->json(['success' => true]);
     }
 
-    public function status()
+    public function status(Request $request)
     {
-        return response()->json(['status' => 'API is running']);
+        $data = $request->validate([
+            'transaction_id' => 'required|string',
+        ]);
+
+        $tx = Transaction::where('transaction_id', $data['transaction_id'])->first();
+
+        if (! $tx) {
+            return response()->json(['error' => 'Transaction not found'], 404);
+        }
+
+        return response()->json([
+            'transaction_id' => $tx->transaction_id,
+            'status' => $tx->status,
+            'bank' => $tx->bank,
+            'account_number' => $tx->account_number,
+            'amount' => $tx->amount,
+            'created_at' => $tx->created_at,
+        ]);
+    }
+
+    public function list()
+    {
+        $transactions = Transaction::orderBy('created_at', 'desc')->get();
+
+        $result = $transactions->map(function ($tx) {
+            return [
+                'transaction_id' => $tx->transaction_id,
+                'bank' => $tx->bank,
+                'account_number' => $tx->account_number,
+                'amount' => $tx->amount,
+                'status' => $tx->status,
+                'created_at' => $tx->created_at,
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+    public function help()
+    {
+        $helpText = [
+            'init' => 'POST /viettap/init - Initialize a new VietQR transaction. Required parameters: bank, account_number, amount.',
+            'submit' => 'POST /viettap/submit - Submit the status of a transaction. Required parameters: transaction_id, status (pending, paid, completed, cancelled, failed).',
+            'status' => 'GET /viettap/status - Get the status of a transaction. Required parameter: transaction_id.',
+            'list' => 'GET /viettap/list - List all transactions.',
+            'help' => 'GET /viettap/help - Show this help information.',
+        ];
+
+        return response()->json($helpText);
     }
 }
