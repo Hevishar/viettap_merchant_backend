@@ -62,11 +62,6 @@ class ViettapController extends Controller
         $merchantName = substr($bank, 0, 25);
         $tlv .= $buildTlv('59', $merchantName);
         $tlv .= $buildTlv('60', '');
-
-        // Additional data field template (62) with transaction reference
-        $adf = $buildTlv('01', $transactionId);
-        $tlv .= $buildTlv('62', $adf);
-
         $toCrc = $tlv . '6304';
 
         $crc16 = function ($str) {
@@ -91,15 +86,9 @@ class ViettapController extends Controller
         $qrString = $tlv;
 
         $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . rawurlencode($qrString);
-        $image = @file_get_contents($qrUrl);
+    
 
-        if ($image === false) {
-            throw new \RuntimeException('Failed to generate QR image');
-        }
-
-        $qrBase64 = 'data:image/png;base64,' . base64_encode($image);
-
-        return ['qr_string' => $qrString, 'qr_base64' => $qrBase64];
+        return ['qr_string' => $qrString, 'image_url' => $qrUrl];
     }
 
     public function submit(Request $request)
