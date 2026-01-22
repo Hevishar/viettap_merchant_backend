@@ -22,7 +22,7 @@ class ViettapController extends Controller
             return response()->json(['error' => 'Unsupported bank'], 400);
         }
 
-        $result = $this->generateVietQr($data['bank'], $data['account_number'], $data['amount'], $transactionId);
+        $result = $this->generateVietQr($bankCodes, $data['account_number'], $data['amount'], $transactionId);
 
         // Persist transaction
         Transaction::create([
