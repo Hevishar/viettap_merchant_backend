@@ -17,13 +17,17 @@ class ViettapController extends Controller
         ]);
 
         $transactionId = (string) Str::uuid();
+        $bankCodes = $this->getBankCode($data['bank']);
+        if (empty($bankCodes)) {
+            return response()->json(['error' => 'Unsupported bank'], 400);
+        }
 
         $result = $this->generateVietQr($data['bank'], $data['account_number'], $data['amount'], $transactionId);
 
         // Persist transaction
         Transaction::create([
             'transaction_id' => $transactionId,
-            'bank' => $data['bank'],
+            'bank' => $bankCodes,
             'account_number' => $data['account_number'],
             'amount' => (int) $data['amount'],
             'qr_string' => $result['qr_string'],
@@ -170,5 +174,28 @@ class ViettapController extends Controller
         ];
 
         return response()->json($helpText);
+    }
+
+    private function getBankCode(string $bankName): string
+    {
+        $bankCodes = [
+            'VCB' => '970436',
+            'TCB' => '970407',
+            'ACB' => '970416',
+            'BIDV' => '970418',
+            'EXB' => '970431',
+            'MBB' => '970422',
+            'NCB' => '970419',
+            'OCB' => '970448',
+            'SHB' => '970443',
+            'STB' => '970403',
+            'TPB' => '970423',
+            'VIB' => '970441',
+            'VPB' => '970432',
+            'ICB' => '970415',
+            'VBA' => '970405',
+        ];
+
+        return $bankCodes[$bankName] ?? '';
     }
 }
