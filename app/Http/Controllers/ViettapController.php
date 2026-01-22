@@ -52,26 +52,26 @@ class ViettapController extends Controller
 
         $tlv = '';
         $mai_38 = '';
+        $mai_38_01 = '';
         
         
         
         $tlv .= $buildTlv('00', '01');
         $tlv .= $buildTlv('01', '12');
         
-        $mai_38_01 = '';
         $mai_38_01 .= $buildTlv('00', $bank);
         $mai_38_01 .= $buildTlv('01', $accountNumber);
-        $mai_38_01 .= $buildTlv('02', 'QRIBFTTA');
 
         $mai_38 .= $buildTlv('00', 'A000000727');
         $mai_38 .= $buildTlv('01', $mai_38_01);
+        $mai_38 .= $buildTlv('02', 'QRIBFTTA');
 
         $tlv .= $buildTlv('38', $mai_38);
 
         $tlv .= $buildTlv('53', '704');
         $tlv .= $buildTlv('54', $amount);
         $tlv .= $buildTlv('58', 'VN');
-        $tlv .= $buildTlv('59', 'Napas Shop');
+        // $tlv .= $buildTlv('59', 'NapasShop');
         $tlv .= $buildTlv('62', str_replace('-', '', $transactionId));
 
         $toCrc = $tlv . '6304';
