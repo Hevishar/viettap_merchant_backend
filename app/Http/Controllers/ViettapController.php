@@ -46,22 +46,29 @@ class ViettapController extends Controller
 
         $amount = number_format($amountValue, 0, '.', '');
 
-        $mai = '';
-        $mai .= $buildTlv('00', 'VietQR');
-        $mai .= $buildTlv('01', $accountNumber);
-        $maiTlv = $buildTlv('26', $mai);
-
         $tlv = '';
+        $mai_38 = '';
+        
+        
+        
         $tlv .= $buildTlv('00', '01');
         $tlv .= $buildTlv('01', '12');
-        $tlv .= $maiTlv;
-        $tlv .= $buildTlv('52', '0000');
+        
+        $mai_38_01 = '';
+        $mai_38_01 .= $buildTlv('00', $bank);
+        $mai_38_01 .= $buildTlv('01', $accountNumber);
+        $mai_38_01 .= $buildTlv('02', 'QRIBFTTA');
+
+        $mai_38 .= $buildTlv('00', 'A000000727');
+        $mai_38 .= $buildTlv('01', $mai_38_01);
+
+        $tlv .= $buildTlv('38', $mai_38);
+
         $tlv .= $buildTlv('53', '704');
         $tlv .= $buildTlv('54', $amount);
         $tlv .= $buildTlv('58', 'VN');
-        $merchantName = substr($bank, 0, 25);
-        $tlv .= $buildTlv('59', $merchantName);
-        $tlv .= $buildTlv('60', '');
+        $tlv .= $buildTlv('59', 'Napas Shop');
+        $tlv .= $buildTlv('62', str_replace('-', '', $transactionId));
 
         $toCrc = $tlv . '6304';
 
