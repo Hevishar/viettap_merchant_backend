@@ -15,27 +15,8 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'price' => 'integer',
     ];
-
-    protected $appends = [
-        'image_url',
-    ];
-
-    public function getImageUrlAttribute()
-    {
-        return asset('storage/' . $this->image);
-    }
-
-    public function getPriceVndAttribute()
-    {
-        return '₫' . number_format($this->price, 0, ',', '.');
-    }
-
-    public function getCategoryNameAttribute()
-    {
-        return $this->category;
-    }
 
     public static function factory()
     {
