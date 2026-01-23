@@ -72,7 +72,7 @@ class ViettapController extends Controller
         $tlv .= $buildTlv('54', $amount);
         $tlv .= $buildTlv('58', 'VN');
         // $tlv .= $buildTlv('59', 'NapasShop');
-        $tlv .= $buildTlv('62', str_replace('-', '', $transactionId));
+        $tlv .= $buildTlv('62', $buildTlv('08', $transactionId));
 
         $toCrc = $tlv . '6304';
 
